@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import Pusher from 'pusher-js';
 
 const PRESETS = [
   "Is a thumb a finger?",
@@ -14,13 +15,12 @@ const PRESETS = [
 ];
 const CATS = ["Politics & Society", "Relationships & Dating", "Food & Lifestyle", "Pop Culture"];
 
-// Stages in order
 const STAGES = ['lobby', 'yesno', 'hotseat', 'photo'];
 
 function blank() {
   return {
-    stage: 'lobby',        // current stage
-    questionIndex: 0,      // current question within yesno stage
+    stage: 'lobby',
+    questionIndex: 0,
     players: {},
     poll: null,
     pollHistory: [],
@@ -29,7 +29,6 @@ function blank() {
     currentPhoto: null,
     presets: PRESETS.slice(),
     categories: CATS.slice(),
-    // legacy compat
     phase: 'lobby',
   };
 }
@@ -40,17 +39,6 @@ function uid() {
 
 function voteCount(votes, v) {
   return Object.values(votes || {}).filter(x => x === v).length;
-}
-
-function getWsUrl() {
-  // If a backend URL is set via env var, use it
-  if (import.meta.env.VITE_WS_URL) {
-    return import.meta.env.VITE_WS_URL;
-  }
-  // Local dev: connect to same host on port 3001
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.hostname;
-  return `${protocol}//${host}:3001`;
 }
 
 const GameContext = createContext(null);
@@ -67,52 +55,59 @@ export function GameProvider({ children }) {
   const [spinning, setSpinning] = useState(false);
   const [spinLabel, setSpinLabel] = useState('');
   const gameRef = useRef(game);
-  const wsRef = useRef(null);
-  const reconnectRef = useRef(null);
+  const pusherRef = useRef(null);
+  const channelRef = useRef(null);
 
   useEffect(() => {
-    function connect() {
-      const ws = new WebSocket(getWsUrl());
-      wsRef.current = ws;
+    const pusherKey = import.meta.env.VITE_PUSHER_KEY;
+    const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER;
 
-      ws.onopen = () => {
-        setConnected(true);
-        console.log('Connected to Hot Seat server');
-      };
-
-      ws.onmessage = (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg.type === 'state') {
-            gameRef.current = msg.state;
-            setGameRaw(msg.state);
-          }
-        } catch {}
-      };
-
-      ws.onclose = () => {
-        setConnected(false);
-        wsRef.current = null;
-        reconnectRef.current = setTimeout(connect, 1000);
-      };
-
-      ws.onerror = () => {
-        ws.close();
-      };
+    if (!pusherKey || !pusherCluster) {
+      console.warn('Pusher credentials not set. Real-time sync disabled.');
+      return;
     }
 
-    connect();
+    Pusher.logToConsole = false;
+    const pusher = new Pusher(pusherKey, {
+      cluster: pusherCluster,
+      forceTLS: true,
+    });
+
+    pusherRef.current = pusher;
+    const channel = pusher.subscribe('hotseat-game');
+    channelRef.current = channel;
+
+    // Listen for state updates
+    channel.bind('state-update', (data) => {
+      gameRef.current = data.state;
+      setGameRaw(data.state);
+    });
+
+    pusher.connection.bind('connected', () => {
+      setConnected(true);
+      console.log('Connected to Pusher');
+    });
+
+    pusher.connection.bind('disconnected', () => {
+      setConnected(false);
+    });
 
     return () => {
-      clearTimeout(reconnectRef.current);
-      wsRef.current?.close();
+      channel.unbind_all();
+      pusher.unsubscribe('hotseat-game');
+      pusher.disconnect();
     };
   }, []);
 
   const sendUpdate = useCallback((state) => {
-    if (wsRef.current?.readyState === 1) {
-      wsRef.current.send(JSON.stringify({ type: 'update', state }));
-    }
+    if (!channelRef.current) return;
+
+    // Trigger via backend endpoint (serverless function)
+    fetch('/api/game-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state }),
+    }).catch(err => console.error('Failed to send update:', err));
   }, []);
 
   const setGame = useCallback((updater) => {
@@ -124,7 +119,6 @@ export function GameProvider({ children }) {
     });
   }, [sendUpdate]);
 
-  // Start the game (leave lobby, go to first real stage)
   const startGame = useCallback(() => {
     setGame(prev => {
       const q = prev.presets[0];
@@ -138,11 +132,10 @@ export function GameProvider({ children }) {
     });
   }, [setGame]);
 
-  // Next question within Yes/No stage
   const nextQuestion = useCallback(() => {
     setGame(prev => {
       const nextIdx = prev.questionIndex + 1;
-      if (nextIdx >= prev.presets.length) return prev; // no more questions
+      if (nextIdx >= prev.presets.length) return prev;
       const q = prev.presets[nextIdx];
       return {
         ...prev,
@@ -153,7 +146,6 @@ export function GameProvider({ children }) {
     });
   }, [setGame]);
 
-  // Skip to next stage
   const skipStage = useCallback(() => {
     setGame(prev => {
       const currentStageIdx = STAGES.indexOf(prev.stage);
@@ -161,13 +153,11 @@ export function GameProvider({ children }) {
       const nextStage = STAGES[currentStageIdx + 1];
       const next = { ...prev, stage: nextStage };
 
-      // Clean up when leaving yesno
       if (prev.stage === 'yesno' && prev.poll) {
         next.pollHistory = [...(prev.pollHistory || []), { ...prev.poll, closed: true }];
         next.poll = null;
       }
 
-      // Set phase for player view compat
       if (nextStage === 'yesno') {
         next.phase = 'part1';
         next.questionIndex = 0;
@@ -183,7 +173,6 @@ export function GameProvider({ children }) {
     });
   }, [setGame]);
 
-  // Close the current poll
   const closePoll = useCallback(() => {
     setGame(prev => {
       if (!prev.poll) return prev;
@@ -215,9 +204,7 @@ export function GameProvider({ children }) {
   }, [setGame]);
 
   const resetAll = useCallback(() => {
-    if (wsRef.current?.readyState === 1) {
-      wsRef.current.send(JSON.stringify({ type: 'reset' }));
-    }
+    fetch('/api/game-reset', { method: 'POST' }).catch(err => console.error('Reset failed:', err));
   }, []);
 
   const value = {
