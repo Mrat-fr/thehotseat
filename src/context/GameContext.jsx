@@ -10,10 +10,13 @@ const PRESETS = [
 ];
 const CATS = ["Politics & Society", "Relationships & Dating", "Food & Lifestyle", "Pop Culture"];
 
+// Stages in order
+const STAGES = ['lobby', 'yesno', 'hotseat', 'photo'];
+
 function blank() {
   return {
-    phase: 'lobby',
-    step: 0,
+    stage: 'lobby',        // current stage
+    questionIndex: 0,      // current question within yesno stage
     players: {},
     poll: null,
     pollHistory: [],
@@ -22,18 +25,9 @@ function blank() {
     currentPhoto: null,
     presets: PRESETS.slice(),
     categories: CATS.slice(),
-    adminPin: '1234',
+    // legacy compat
+    phase: 'lobby',
   };
-}
-
-function getSteps(presets) {
-  return [
-    { phase: 'lobby', label: 'Welcome lobby' },
-    ...presets.map((q, i) => ({ phase: 'part1', label: `Poll: "${q.slice(0, 30)}…"`, idx: i })),
-    { phase: 'part2', label: 'Hot Seat — volunteers' },
-    { phase: 'part2b', label: 'Hot Seat — pick & reveal' },
-    { phase: 'part3', label: 'Photo Takeover' },
-  ];
 }
 
 function uid() {
@@ -44,7 +38,6 @@ function voteCount(votes, v) {
   return Object.values(votes || {}).filter(x => x === v).length;
 }
 
-// Determine WebSocket URL based on current page location
 function getWsUrl() {
   const host = window.location.hostname;
   return `ws://${host}:3001`;
@@ -61,14 +54,12 @@ const myPid = sessionStorage.getItem('hs_pid2') || (() => {
 export function GameProvider({ children }) {
   const [game, setGameRaw] = useState(blank);
   const [connected, setConnected] = useState(false);
-  const [adminTab, setAdminTab] = useState('live');
   const [spinning, setSpinning] = useState(false);
   const [spinLabel, setSpinLabel] = useState('');
   const gameRef = useRef(game);
   const wsRef = useRef(null);
   const reconnectRef = useRef(null);
 
-  // Connect to WebSocket server
   useEffect(() => {
     function connect() {
       const ws = new WebSocket(getWsUrl());
@@ -92,7 +83,6 @@ export function GameProvider({ children }) {
       ws.onclose = () => {
         setConnected(false);
         wsRef.current = null;
-        // Auto-reconnect after 1 second
         reconnectRef.current = setTimeout(connect, 1000);
       };
 
@@ -109,7 +99,6 @@ export function GameProvider({ children }) {
     };
   }, []);
 
-  // Send state update to server
   const sendUpdate = useCallback((state) => {
     if (wsRef.current?.readyState === 1) {
       wsRef.current.send(JSON.stringify({ type: 'update', state }));
@@ -125,22 +114,70 @@ export function GameProvider({ children }) {
     });
   }, [sendUpdate]);
 
-  const advance = useCallback(() => {
+  // Start the game (leave lobby, go to first real stage)
+  const startGame = useCallback(() => {
     setGame(prev => {
-      const allSteps = getSteps(prev.presets);
-      const ni = (prev.step || 0) + 1;
-      if (ni >= allSteps.length) return prev;
-      const s = allSteps[ni];
-      const next = { ...prev, step: ni, phase: s.phase };
-      if (s.phase === 'part1' && s.idx !== undefined) {
-        if (prev.poll) next.pollHistory = [...(prev.pollHistory || []), { ...prev.poll, closed: true }];
-        next.poll = { question: prev.presets[s.idx], votes: {}, closed: false };
-      }
-      if (s.phase === 'part2' && prev.poll) {
+      const q = prev.presets[0];
+      return {
+        ...prev,
+        stage: 'yesno',
+        phase: 'part1',
+        questionIndex: 0,
+        poll: q ? { question: q, votes: {}, closed: false } : null,
+      };
+    });
+  }, [setGame]);
+
+  // Next question within Yes/No stage
+  const nextQuestion = useCallback(() => {
+    setGame(prev => {
+      const nextIdx = prev.questionIndex + 1;
+      if (nextIdx >= prev.presets.length) return prev; // no more questions
+      const q = prev.presets[nextIdx];
+      return {
+        ...prev,
+        questionIndex: nextIdx,
+        pollHistory: prev.poll ? [...(prev.pollHistory || []), { ...prev.poll, closed: true }] : prev.pollHistory,
+        poll: { question: q, votes: {}, closed: false },
+      };
+    });
+  }, [setGame]);
+
+  // Skip to next stage
+  const skipStage = useCallback(() => {
+    setGame(prev => {
+      const currentStageIdx = STAGES.indexOf(prev.stage);
+      if (currentStageIdx < 0 || currentStageIdx >= STAGES.length - 1) return prev;
+      const nextStage = STAGES[currentStageIdx + 1];
+      const next = { ...prev, stage: nextStage };
+
+      // Clean up when leaving yesno
+      if (prev.stage === 'yesno' && prev.poll) {
         next.pollHistory = [...(prev.pollHistory || []), { ...prev.poll, closed: true }];
         next.poll = null;
       }
+
+      // Set phase for player view compat
+      if (nextStage === 'yesno') {
+        next.phase = 'part1';
+        next.questionIndex = 0;
+        next.poll = prev.presets[0] ? { question: prev.presets[0], votes: {}, closed: false } : null;
+      } else if (nextStage === 'hotseat') {
+        next.phase = 'part2';
+        next.hotSeat = { candidates: [], selected: null, category: null };
+      } else if (nextStage === 'photo') {
+        next.phase = 'part3';
+      }
+
       return next;
+    });
+  }, [setGame]);
+
+  // Close the current poll
+  const closePoll = useCallback(() => {
+    setGame(prev => {
+      if (!prev.poll) return prev;
+      return { ...prev, poll: { ...prev.poll, closed: true } };
     });
   }, [setGame]);
 
@@ -171,15 +208,15 @@ export function GameProvider({ children }) {
     if (wsRef.current?.readyState === 1) {
       wsRef.current.send(JSON.stringify({ type: 'reset' }));
     }
-    setAdminTab('live');
   }, []);
 
   const value = {
     game, setGame, connected,
-    adminTab, setAdminTab,
     spinning, spinLabel,
-    myPid, advance, doPickHotSeat, resetAll,
-    getSteps, voteCount, uid, blank,
+    myPid, startGame, nextQuestion, skipStage, closePoll,
+    doPickHotSeat, resetAll,
+    voteCount, uid, blank,
+    STAGES,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
