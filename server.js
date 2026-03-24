@@ -1,22 +1,27 @@
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const PRESETS = [
-  "Pineapple belongs on pizza",
-  "Social media has done more harm than good",
-  "Cancel culture has gone too far",
-  "The monarchy should be abolished",
-  "WFH is better for productivity",
-  "Reality TV is genuinely good entertainment",
+  "Is a thumb a finger?",
+  "If you win the lottery today, does it make you a \"successful\" person?",
+  "Is cereal a soup?",
+  "Is a cheesecake a cake or a pie?",
+  "If a tomato is a fruit, is ketchup a smoothie?",
+  "Does the \"5-second rule\" actually exist?",
+  "Is the \"Snooze\" button a gift or a curse?",
+  "Is \"Camping\" a vacation or just \"paying to be homeless\" for a weekend?",
+  "Is \"A.I. Art\" actually art?",
+  "Is \"Working from Home\" more productive than the office?",
 ];
 const CATS = ["Politics & Society", "Relationships & Dating", "Food & Lifestyle", "Pop Culture"];
 
 function blank() {
   return {
+    stage: 'lobby',
     phase: 'lobby',
-    step: 0,
+    questionIndex: 0,
     players: {},
     poll: null,
     pollHistory: [],
@@ -25,7 +30,6 @@ function blank() {
     currentPhoto: null,
     presets: PRESETS.slice(),
     categories: CATS.slice(),
-    adminPin: '1234',
   };
 }
 

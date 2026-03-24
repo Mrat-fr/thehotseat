@@ -1,12 +1,16 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 
 const PRESETS = [
-  "Pineapple belongs on pizza",
-  "Social media has done more harm than good",
-  "Cancel culture has gone too far",
-  "The monarchy should be abolished",
-  "WFH is better for productivity",
-  "Reality TV is genuinely good entertainment",
+  "Is a thumb a finger?",
+  "If you win the lottery today, does it make you a \"successful\" person?",
+  "Is cereal a soup?",
+  "Is a cheesecake a cake or a pie?",
+  "If a tomato is a fruit, is ketchup a smoothie?",
+  "Does the \"5-second rule\" actually exist?",
+  "Is the \"Snooze\" button a gift or a curse?",
+  "Is \"Camping\" a vacation or just \"paying to be homeless\" for a weekend?",
+  "Is \"A.I. Art\" actually art?",
+  "Is \"Working from Home\" more productive than the office?",
 ];
 const CATS = ["Politics & Society", "Relationships & Dating", "Food & Lifestyle", "Pop Culture"];
 
@@ -39,8 +43,14 @@ function voteCount(votes, v) {
 }
 
 function getWsUrl() {
+  // If a backend URL is set via env var, use it
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
+  // Local dev: connect to same host on port 3001
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.hostname;
-  return `ws://${host}:3001`;
+  return `${protocol}//${host}:3001`;
 }
 
 const GameContext = createContext(null);
