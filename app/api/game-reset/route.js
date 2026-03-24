@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import Pusher from 'pusher';
 
 const PRESETS = [
@@ -37,15 +38,10 @@ const pusher = new Pusher({
   cluster: process.env.PUSHER_CLUSTER,
 });
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST() {
   const newState = blank();
 
-  // Broadcast reset
   await pusher.trigger('hotseat-game', 'state-update', { state: newState });
 
-  res.status(200).json({ ok: true });
+  return NextResponse.json({ ok: true });
 }

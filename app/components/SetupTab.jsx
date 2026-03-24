@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 
 export default function SetupTab() {
@@ -34,9 +36,9 @@ export default function SetupTab() {
               value={p}
               onChange={e => { const n = [...presets]; n[i] = e.target.value; setPresets(n); }}
               style={{ fontSize: '.85rem', padding: '7px 10px' }}
-              placeholder={`Hot take ${i + 1}…`}
+              placeholder={`Hot take ${i + 1}...`}
             />
-            <button className="btn btn-ghost btn-sm" onClick={() => setPresets(presets.filter((_, j) => j !== i))}>✕</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setPresets(presets.filter((_, j) => j !== i))}>X</button>
           </div>
         ))}
         <button className="btn btn-ghost btn-sm" onClick={() => setPresets([...presets, ''])} style={{ marginTop: 2 }}>+ ADD</button>
@@ -52,9 +54,9 @@ export default function SetupTab() {
               value={c}
               onChange={e => { const n = [...cats]; n[i] = e.target.value; setCats(n); }}
               style={{ fontSize: '.85rem', padding: '7px 10px' }}
-              placeholder={`Category ${i + 1}…`}
+              placeholder={`Category ${i + 1}...`}
             />
-            <button className="btn btn-ghost btn-sm" onClick={() => setCats(cats.filter((_, j) => j !== i))}>✕</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setCats(cats.filter((_, j) => j !== i))}>X</button>
           </div>
         ))}
         <button className="btn btn-ghost btn-sm" onClick={() => setCats([...cats, ''])} style={{ marginTop: 2 }}>+ ADD</button>
@@ -74,7 +76,7 @@ export default function SetupTab() {
       </div>
 
       <button className="btn btn-g btn-lg btn-full" onClick={saveSetup}>
-        {saved ? '✅ SAVED!' : '💾 SAVE CHANGES'}
+        {saved ? 'SAVED!' : 'SAVE CHANGES'}
       </button>
     </div>
   );

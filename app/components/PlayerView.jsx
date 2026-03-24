@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 
@@ -7,8 +9,8 @@ function PlayerHeader({ name }) {
       background: '#0f0f1c', borderBottom: '1px solid #252538',
       padding: '10px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
-      <span className="fd" style={{ fontSize: '1.1rem', color: '#ff2d55' }}>🔥 HOT SEAT</span>
-      <span style={{ color: '#5a5a8a', fontSize: '.82rem' }}>👤 {name}</span>
+      <span className="fd" style={{ fontSize: '1.1rem', color: '#ff2d55' }}>HOT SEAT</span>
+      <span style={{ color: '#5a5a8a', fontSize: '.82rem' }}>{name}</span>
     </div>
   );
 }
@@ -17,8 +19,8 @@ function LobbyWaiting() {
   return (
     <div style={{ textAlign: 'center', padding: '48px 0', animation: 'fadeUp .4s ease' }}>
       <div style={{ fontSize: '2.5rem', marginBottom: 10 }}>🎉</div>
-      <p className="fd" style={{ fontSize: '2rem', color: '#ffd60a' }}>YOU'RE IN!</p>
-      <p style={{ color: '#5a5a8a', marginTop: 8 }}>The host will kick things off soon…</p>
+      <p className="fd" style={{ fontSize: '2rem', color: '#ffd60a' }}>YOU ARE IN!</p>
+      <p style={{ color: '#5a5a8a', marginTop: 8 }}>The host will kick things off soon...</p>
     </div>
   );
 }
@@ -27,7 +29,7 @@ function PollPhase() {
   const { game, setGame, myPid } = useGame();
   const poll = game.poll;
 
-  if (!poll) return <div style={{ textAlign: 'center', padding: '40px 0', color: '#5a5a8a' }}>Next poll loading…</div>;
+  if (!poll) return <div style={{ textAlign: 'center', padding: '40px 0', color: '#5a5a8a' }}>Next poll loading...</div>;
   if (poll.closed) return (
     <div style={{ textAlign: 'center', padding: '40px 0' }}>
       <p className="fd" style={{ fontSize: '1.5rem', color: '#ffd60a' }}>POLL CLOSED</p>
@@ -54,7 +56,7 @@ function PollPhase() {
           textAlign: 'center', padding: 24, background: 'rgba(255,45,85,.12)',
           border: '2px solid rgba(255,45,85,.4)', borderRadius: 12,
         }}>
-          <p className="fd" style={{ fontSize: '1.4rem', color: '#ff2d55' }}>LOCKED IN ✅</p>
+          <p className="fd" style={{ fontSize: '1.4rem', color: '#ff2d55' }}>LOCKED IN</p>
           <p style={{ color: '#5a5a8a', marginTop: 4 }}>Your vote: <strong style={{ color: '#eeeef8' }}>{voted.toUpperCase()}</strong></p>
         </div>
       </div>
@@ -69,11 +71,11 @@ function PollPhase() {
         <button className="btn btn-full" onClick={() => vote('yes')} style={{
           background: '#00c96e', color: '#fff', fontFamily: "'Bebas Neue',sans-serif",
           fontSize: '1.8rem', padding: 22, letterSpacing: 2, borderRadius: 10,
-        }}>✅ YES</button>
+        }}>YES</button>
         <button className="btn btn-r btn-full" onClick={() => vote('no')} style={{
           fontFamily: "'Bebas Neue',sans-serif", fontSize: '1.8rem', padding: 22,
           letterSpacing: 2, borderRadius: 10,
-        }}>❌ NO</button>
+        }}>NO</button>
       </div>
     </div>
   );
@@ -105,8 +107,8 @@ function HotSeatPhase() {
   if (isInHotSeat) {
     return (
       <div style={{ textAlign: 'center', animation: 'zoomIn .3s ease' }}>
-        <p className="fd" style={{ color: '#ff2d55', letterSpacing: 3 }}>YOU'RE IN THE</p>
-        <p className="fd" style={{ fontSize: '3rem', color: '#ffd60a', animation: 'neonY 2s infinite' }}>🔥 HOT SEAT</p>
+        <p className="fd" style={{ color: '#ff2d55', letterSpacing: 3 }}>YOU ARE IN THE</p>
+        <p className="fd" style={{ fontSize: '3rem', color: '#ffd60a', animation: 'neonY 2s infinite' }}>HOT SEAT</p>
         <p style={{ color: '#5a5a8a', margin: '12px 0 20px', fontSize: '.9rem' }}>Pick your category:</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {categories.map(cat => (
@@ -128,7 +130,7 @@ function HotSeatPhase() {
             marginTop: 14, padding: '10px 20px', background: 'rgba(255,45,85,.12)',
             borderRadius: 10, border: '1px solid rgba(255,45,85,.3)',
           }}>
-            <p style={{ color: '#ff2d55', fontSize: '.9rem' }}>Locked ✅ — head to the front!</p>
+            <p style={{ color: '#ff2d55', fontSize: '.9rem' }}>Locked — head to the front!</p>
           </div>
         )}
       </div>
@@ -139,7 +141,7 @@ function HotSeatPhase() {
 
   return (
     <div style={{ animation: 'fadeUp .3s ease' }}>
-      <p className="fd" style={{ fontSize: '1.4rem', color: '#ff2d55', marginBottom: 6 }}>🔥 HOT SEAT</p>
+      <p className="fd" style={{ fontSize: '1.4rem', color: '#ff2d55', marginBottom: 6 }}>HOT SEAT</p>
       <p style={{ color: '#5a5a8a', fontSize: '.88rem', marginBottom: 20 }}>
         Tap to volunteer — host randomly picks from all volunteers.
       </p>
@@ -148,7 +150,7 @@ function HotSeatPhase() {
           background: 'rgba(255,214,10,.1)', border: '1px solid rgba(255,214,10,.3)',
           borderRadius: 10, padding: 12, marginBottom: 16, textAlign: 'center',
         }}>
-          <p className="fd" style={{ color: '#ffd60a' }}>🔥 {selectedPlayer.name} is in the hot seat!</p>
+          <p className="fd" style={{ color: '#ffd60a' }}>{selectedPlayer.name} is in the hot seat!</p>
         </div>
       )}
       <button
@@ -160,7 +162,7 @@ function HotSeatPhase() {
           border: isOptedIn ? 'none' : '2px dashed #252538',
         }}
       >
-        {isOptedIn ? '🙋 OPTED IN — TAP TO REMOVE' : '🙋 VOLUNTEER FOR THE HOT SEAT'}
+        {isOptedIn ? 'OPTED IN — TAP TO REMOVE' : 'VOLUNTEER FOR THE HOT SEAT'}
       </button>
       <p style={{ color: '#5a5a8a', fontSize: '.78rem', textAlign: 'center', marginTop: 10 }}>
         {hotSeat.candidates.length} volunteer{hotSeat.candidates.length !== 1 ? 's' : ''}
@@ -203,7 +205,7 @@ function PhotoPhase() {
 
   return (
     <div style={{ animation: 'fadeUp .3s ease' }}>
-      <p className="fd" style={{ fontSize: '1.3rem', color: '#00e8ff', marginBottom: 4 }}>📸 PHOTO TAKEOVER</p>
+      <p className="fd" style={{ fontSize: '1.3rem', color: '#00e8ff', marginBottom: 4 }}>PHOTO TAKEOVER</p>
       <p style={{ color: '#5a5a8a', fontSize: '.88rem', marginBottom: 18 }}>
         Upload a random photo — debaters have to work it into their argument!
       </p>
@@ -212,22 +214,22 @@ function PhotoPhase() {
           textAlign: 'center', padding: 24, background: 'rgba(0,232,255,.08)',
           border: '2px solid rgba(0,232,255,.3)', borderRadius: 12,
         }}>
-          <p className="fd" style={{ fontSize: '1.3rem', color: '#00e8ff' }}>SUBMITTED! 📤</p>
-          <p style={{ color: '#5a5a8a', marginTop: 6, fontSize: '.82rem' }}>Waiting for host approval…</p>
+          <p className="fd" style={{ fontSize: '1.3rem', color: '#00e8ff' }}>SUBMITTED!</p>
+          <p style={{ color: '#5a5a8a', marginTop: 6, fontSize: '.82rem' }}>Waiting for host approval...</p>
           <button className="btn btn-ghost btn-sm" onClick={() => setPhotoSent(false)} style={{ marginTop: 12 }}>Submit another</button>
         </div>
       ) : photoFile ? (
         <div>
           <img src={photoFile} style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 10, marginBottom: 14 }} alt="Preview" />
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn btn-c btn-lg" onClick={sendPhoto} style={{ flex: 1 }}>✅ SEND IT</button>
+            <button className="btn btn-c btn-lg" onClick={sendPhoto} style={{ flex: 1 }}>SEND IT</button>
             <button className="btn btn-ghost" onClick={() => setPhotoFile(null)}>REDO</button>
           </div>
         </div>
       ) : (
         <div>
           <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
-          <button className="btn btn-c btn-lg btn-full" onClick={() => fileRef.current?.click()}>📁 CHOOSE A PHOTO</button>
+          <button className="btn btn-c btn-lg btn-full" onClick={() => fileRef.current?.click()}>CHOOSE A PHOTO</button>
         </div>
       )}
       {game.currentPhoto && (
@@ -235,7 +237,7 @@ function PhotoPhase() {
           marginTop: 18, padding: '10px 14px', background: 'rgba(0,232,255,.08)',
           borderRadius: 10, border: '1px solid rgba(0,232,255,.2)',
         }}>
-          <p style={{ color: '#00e8ff', fontSize: '.82rem' }}>📺 On screen: photo by <strong>{game.currentPhoto.playerName}</strong></p>
+          <p style={{ color: '#00e8ff', fontSize: '.82rem' }}>On screen: photo by <strong>{game.currentPhoto.playerName}</strong></p>
         </div>
       )}
     </div>
@@ -256,7 +258,6 @@ export default function PlayerView() {
     }));
   }
 
-  // Not joined yet — show join screen
   if (!me) {
     return (
       <div style={{ minHeight: '100vh', background: '#07070e' }}>
@@ -272,14 +273,14 @@ export default function PlayerView() {
           <div style={{ width: '100%', maxWidth: 340 }}>
             <input
               className="inp"
-              placeholder="Your name or nickname…"
+              placeholder="Your name or nickname..."
               value={nameInput}
               onChange={e => setNameInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && join()}
               style={{ textAlign: 'center', fontSize: '1.1rem', marginBottom: 14 }}
               autoFocus
             />
-            <button className="btn btn-r btn-lg btn-full" onClick={join}>JOIN →</button>
+            <button className="btn btn-r btn-lg btn-full" onClick={join}>JOIN</button>
           </div>
           <p style={{ color: '#5a5a8a', fontSize: '.72rem', marginTop: 18 }}>Ask the host if you need help joining</p>
         </div>
@@ -287,13 +288,12 @@ export default function PlayerView() {
     );
   }
 
-  // Joined — render phase content
   let content;
   if (game.phase === 'lobby') content = <LobbyWaiting />;
   else if (game.phase === 'part1') content = <PollPhase />;
   else if (game.phase === 'part2' || game.phase === 'part2b') content = <HotSeatPhase />;
   else if (game.phase === 'part3') content = <PhotoPhase />;
-  else content = <div style={{ color: '#5a5a8a', textAlign: 'center', padding: '40px 0' }}>Waiting…</div>;
+  else content = <div style={{ color: '#5a5a8a', textAlign: 'center', padding: '40px 0' }}>Waiting...</div>;
 
   return (
     <div style={{ minHeight: '100vh', background: '#07070e' }}>

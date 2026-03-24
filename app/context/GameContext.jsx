@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import Pusher from 'pusher-js';
 
@@ -43,24 +45,28 @@ function voteCount(votes, v) {
 
 const GameContext = createContext(null);
 
-const myPid = sessionStorage.getItem('hs_pid2') || (() => {
+function getMyPid() {
+  if (typeof window === 'undefined') return 'server';
+  const existing = sessionStorage.getItem('hs_pid2');
+  if (existing) return existing;
   const id = Math.random().toString(36).slice(2, 9);
   sessionStorage.setItem('hs_pid2', id);
   return id;
-})();
+}
 
 export function GameProvider({ children }) {
   const [game, setGameRaw] = useState(blank);
   const [connected, setConnected] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const [spinLabel, setSpinLabel] = useState('');
+  const [myPid] = useState(getMyPid);
   const gameRef = useRef(game);
   const pusherRef = useRef(null);
   const channelRef = useRef(null);
 
   useEffect(() => {
-    const pusherKey = import.meta.env.VITE_PUSHER_KEY;
-    const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER;
+    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
+    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 
     if (!pusherKey || !pusherCluster) {
       console.warn('Pusher credentials not set. Real-time sync disabled.');
@@ -77,7 +83,6 @@ export function GameProvider({ children }) {
     const channel = pusher.subscribe('hotseat-game');
     channelRef.current = channel;
 
-    // Listen for state updates
     channel.bind('state-update', (data) => {
       gameRef.current = data.state;
       setGameRaw(data.state);
@@ -102,7 +107,6 @@ export function GameProvider({ children }) {
   const sendUpdate = useCallback((state) => {
     if (!channelRef.current) return;
 
-    // Trigger via backend endpoint (serverless function)
     fetch('/api/game-update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -9,8 +9,6 @@ body {
   min-height: 100vh;
 }
 
-#root { min-height: 100vh; }
-
 .fd { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
 
 /* Buttons */

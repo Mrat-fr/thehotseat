@@ -1,3 +1,5 @@
+'use client';
+
 import { useGame } from '../context/GameContext';
 import BigLabel from './BigLabel';
 
@@ -24,7 +26,7 @@ export default function PresArea() {
           <p style={{
             color: '#eeeef8', fontSize: '1.4rem', fontFamily: 'monospace',
             background: '#161625', padding: '10px 24px', borderRadius: 8,
-          }}>{window.location.origin}/play</p>
+          }}>{typeof window !== 'undefined' ? window.location.origin : ''}/play</p>
         </div>
         {playerList.length > 0 && (
           <div style={{ marginTop: 20, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
@@ -46,12 +48,12 @@ export default function PresArea() {
     const yP = tv ? Math.round(yC / tv * 100) : 0;
     const nP = tv ? Math.round(nC / tv * 100) : 0;
     const bars = [
-      { label: 'YES ✅', val: 'yes', color: '#00c96e', pct: yP, cnt: yC },
-      { label: 'NO ❌', val: 'no', color: '#ff2d55', pct: nP, cnt: nC },
+      { label: 'YES', val: 'yes', color: '#00c96e', pct: yP, cnt: yC },
+      { label: 'NO', val: 'no', color: '#ff2d55', pct: nP, cnt: nC },
     ];
     return (
       <div style={{ width: '100%', maxWidth: 700, animation: 'fadeUp .4s ease' }}>
-        <p className="fd" style={{ color: '#ffd60a', letterSpacing: 3, fontSize: '.95rem', marginBottom: 8 }}>🔥 HOT TAKE</p>
+        <p className="fd" style={{ color: '#ffd60a', letterSpacing: 3, fontSize: '.95rem', marginBottom: 8 }}>HOT TAKE</p>
         <p className="fd" style={{ fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', color: '#eeeef8', marginBottom: 28, lineHeight: 1.05 }}>{poll.question}</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {bars.map(b => (
@@ -72,7 +74,7 @@ export default function PresArea() {
     );
   }
 
-  if (phase === 'part1' && !poll) return <BigLabel color="#ffd60a" icon="📊" text="LIVE POLLS" sub="Launching next hot take…" />;
+  if (phase === 'part1' && !poll) return <BigLabel color="#ffd60a" icon="📊" text="LIVE POLLS" sub="Launching next hot take..." />;
 
   if ((phase === 'part2' || phase === 'part2b') && !sel) return <BigLabel color="#ff2d55" icon="🔥" text="THE HOT SEAT" sub="Volunteer on your phone!" />;
 
@@ -80,7 +82,7 @@ export default function PresArea() {
     return (
       <div style={{ textAlign: 'center', animation: 'zoomIn .4s ease' }}>
         <p className="fd" style={{ color: '#ff2d55', letterSpacing: 4, fontSize: '1.1rem', marginBottom: 6 }}>NOW IN THE</p>
-        <p className="fd" style={{ fontSize: 'clamp(2.5rem,7vw,6rem)', color: '#ffd60a', lineHeight: '.85', animation: 'neonY 2s infinite' }}>🔥 HOT SEAT 🔥</p>
+        <p className="fd" style={{ fontSize: 'clamp(2.5rem,7vw,6rem)', color: '#ffd60a', lineHeight: '.85', animation: 'neonY 2s infinite' }}>HOT SEAT</p>
         <p className="fd" style={{ fontSize: 'clamp(1.8rem,4vw,4rem)', color: '#eeeef8', marginTop: 12 }}>{sel.name}</p>
         {hotSeat.category ? (
           <div style={{
@@ -90,7 +92,7 @@ export default function PresArea() {
             <p className="fd" style={{ fontSize: '1.6rem', color: '#00e8ff', letterSpacing: 2 }}>{hotSeat.category}</p>
           </div>
         ) : (
-          <p style={{ color: '#5a5a8a', marginTop: 14, animation: 'flashAnim 1s infinite' }}>{sel.name} is picking a category…</p>
+          <p style={{ color: '#5a5a8a', marginTop: 14, animation: 'flashAnim 1s infinite' }}>{sel.name} is picking a category...</p>
         )}
       </div>
     );
@@ -101,7 +103,7 @@ export default function PresArea() {
   if (phase === 'part3' && currentPhoto) {
     return (
       <div style={{ textAlign: 'center', animation: 'zoomIn .35s ease' }}>
-        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 3, marginBottom: 10 }}>📸 PHOTO FROM {currentPhoto.playerName.toUpperCase()}</p>
+        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 3, marginBottom: 10 }}>PHOTO FROM {currentPhoto.playerName.toUpperCase()}</p>
         <img src={currentPhoto.dataUrl} style={{ maxWidth: '100%', maxHeight: '50vh', borderRadius: 12, objectFit: 'contain', border: '3px solid #00e8ff' }} alt="Submitted" />
         <p style={{ color: '#5a5a8a', marginTop: 10, fontStyle: 'italic' }}>Debaters — work this into your argument!</p>
       </div>

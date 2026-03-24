@@ -1,13 +1,15 @@
+'use client';
+
 import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import PresArea from './PresArea';
 import SetupTab from './SetupTab';
 
 const STAGE_LABELS = {
-  lobby: '🏠 LOBBY',
-  yesno: '📊 YES OR NO',
-  hotseat: '🔥 HOT SEAT',
-  photo: '📸 PHOTO TAKEOVER',
+  lobby: 'LOBBY',
+  yesno: 'YES OR NO',
+  hotseat: 'HOT SEAT',
+  photo: 'PHOTO TAKEOVER',
 };
 
 function LobbyControls() {
@@ -27,15 +29,14 @@ function LobbyControls() {
           disabled={playerList.length === 0}
           style={{ fontSize: '1.3rem', padding: '16px 0' }}
         >
-          🚀 START GAME
+          START GAME
         </button>
       </div>
 
-      {/* Player list */}
       <div style={{ background: '#161625', border: '1px solid #252538', borderRadius: 10, padding: 14 }}>
         <p className="fd" style={{ color: '#5a5a8a', fontSize: '.7rem', letterSpacing: 2, marginBottom: 8 }}>PLAYERS ({playerList.length})</p>
         {!playerList.length ? (
-          <p style={{ color: '#5a5a8a', fontSize: '.82rem' }}>Waiting for players to join…</p>
+          <p style={{ color: '#5a5a8a', fontSize: '.82rem' }}>Waiting for players to join...</p>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {playerList.map(p => (
@@ -61,7 +62,6 @@ function YesNoControls() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Current question info */}
       <div style={{ background: '#161625', border: '2px solid rgba(255,214,10,.4)', borderRadius: 10, padding: 16 }}>
         <p className="fd" style={{ color: '#5a5a8a', fontSize: '.68rem', letterSpacing: 2, marginBottom: 4 }}>
           QUESTION {questionIndex + 1} OF {presets.length}
@@ -72,7 +72,6 @@ function YesNoControls() {
               {poll.question}
             </p>
 
-            {/* Live vote counts */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
               {[
                 ['YES', 'yes', '#00c96e'],
@@ -94,19 +93,17 @@ function YesNoControls() {
               {tv} of {playerList.length} voted
             </p>
 
-            {/* Close poll button */}
             {!poll.closed ? (
               <button className="btn btn-ghost btn-sm btn-full" onClick={closePoll} style={{ marginBottom: 10 }}>
-                🔒 CLOSE POLL
+                CLOSE POLL
               </button>
             ) : (
-              <p className="fd" style={{ color: '#ff2d55', fontSize: '.76rem', textAlign: 'center', marginBottom: 10 }}>● POLL CLOSED</p>
+              <p className="fd" style={{ color: '#ff2d55', fontSize: '.76rem', textAlign: 'center', marginBottom: 10 }}>POLL CLOSED</p>
             )}
           </>
         )}
       </div>
 
-      {/* Host action buttons */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <button
           className="btn btn-r btn-xl btn-full"
@@ -114,7 +111,7 @@ function YesNoControls() {
           disabled={isLastQuestion}
           style={{ fontSize: '1.1rem', padding: '14px 0' }}
         >
-          {isLastQuestion ? '✅ LAST QUESTION' : 'NEXT QUESTION →'}
+          {isLastQuestion ? 'LAST QUESTION' : 'NEXT QUESTION'}
         </button>
 
         <button
@@ -127,7 +124,7 @@ function YesNoControls() {
             fontSize: '.9rem', padding: '10px 0', borderRadius: 8,
           }}
         >
-          ⏭ SKIP TO NEXT STAGE
+          SKIP TO NEXT STAGE
         </button>
       </div>
     </div>
@@ -143,7 +140,7 @@ function HotSeatControls() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ background: '#161625', border: '2px solid rgba(255,45,85,.4)', borderRadius: 10, padding: 16, textAlign: 'center' }}>
-        <p className="fd" style={{ color: '#ff2d55', letterSpacing: 2, fontSize: '.85rem', marginBottom: 12 }}>🔥 HOT SEAT</p>
+        <p className="fd" style={{ color: '#ff2d55', letterSpacing: 2, fontSize: '.85rem', marginBottom: 12 }}>HOT SEAT</p>
 
         {spinning && (
           <p className="fd" style={{ fontSize: '1.8rem', color: '#ffd60a', animation: 'flashAnim .12s infinite', marginBottom: 12 }}>{spinLabel}</p>
@@ -153,22 +150,22 @@ function HotSeatControls() {
           <div style={{ marginBottom: 14 }}>
             <p className="fd" style={{ fontSize: '1.5rem', color: '#ffd60a' }}>{sel.name}</p>
             {hotSeat.category ? (
-              <p className="fd" style={{ color: '#00e8ff', fontSize: '.9rem', marginTop: 4 }}>📂 {hotSeat.category}</p>
+              <p className="fd" style={{ color: '#00e8ff', fontSize: '.9rem', marginTop: 4 }}>{hotSeat.category}</p>
             ) : (
-              <p style={{ color: '#5a5a8a', fontSize: '.8rem', animation: 'flashAnim 1.2s infinite', marginTop: 4 }}>Waiting for category…</p>
+              <p style={{ color: '#5a5a8a', fontSize: '.8rem', animation: 'flashAnim 1.2s infinite', marginTop: 4 }}>Waiting for category...</p>
             )}
           </div>
         )}
 
         {!sel && !spinning && (
           <p style={{ color: '#5a5a8a', fontSize: '.85rem', marginBottom: 12 }}>
-            🙋 {hotSeat.candidates.length} volunteer{hotSeat.candidates.length !== 1 ? 's' : ''}
+            {hotSeat.candidates.length} volunteer{hotSeat.candidates.length !== 1 ? 's' : ''}
           </p>
         )}
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
           <button className="btn btn-r" onClick={doPickHotSeat} disabled={!hotSeat.candidates.length || spinning}>
-            🎲 RANDOM PICK
+            RANDOM PICK
           </button>
           {sel && (
             <button className="btn btn-ghost btn-sm" onClick={() => setGame(s => ({
@@ -178,7 +175,6 @@ function HotSeatControls() {
         </div>
       </div>
 
-      {/* Players with opt-in status */}
       <div style={{ background: '#161625', border: '1px solid #252538', borderRadius: 10, padding: 12 }}>
         <p className="fd" style={{ color: '#5a5a8a', fontSize: '.7rem', letterSpacing: 2, marginBottom: 8 }}>PLAYERS ({playerList.length})</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -191,7 +187,7 @@ function HotSeatControls() {
                 background: opted ? 'rgba(255,45,85,.12)' : '#0f0f1c',
                 border: `1px solid ${opted ? 'rgba(255,45,85,.4)' : '#252538'}`,
                 padding: '2px 9px', borderRadius: 12,
-              }}>{opted ? '🙋 ' : ''}{p.name}</span>
+              }}>{opted ? '+ ' : ''}{p.name}</span>
             );
           })}
         </div>
@@ -207,7 +203,7 @@ function HotSeatControls() {
           fontSize: '.9rem', padding: '10px 0', borderRadius: 8,
         }}
       >
-        ⏭ SKIP TO NEXT STAGE
+        SKIP TO NEXT STAGE
       </button>
     </div>
   );
@@ -222,7 +218,7 @@ function PhotoControls() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ background: '#161625', border: '2px solid rgba(0,232,255,.4)', borderRadius: 10, padding: 16 }}>
-        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 2, fontSize: '.85rem', marginBottom: 12 }}>📸 PHOTO TAKEOVER</p>
+        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 2, fontSize: '.85rem', marginBottom: 12 }}>PHOTO TAKEOVER</p>
 
         {currentPhoto && (
           <div style={{ marginBottom: 12 }}>
@@ -242,10 +238,9 @@ function PhotoControls() {
             }));
           }}
           style={{ marginBottom: 10, padding: '12px 0', fontSize: '1rem' }}
-        >📸 REVEAL RANDOM ({readyQ.length})</button>
+        >REVEAL RANDOM ({readyQ.length})</button>
       </div>
 
-      {/* Pending approvals */}
       {pending.length > 0 && (
         <div style={{ background: '#161625', border: '1px solid #252538', borderRadius: 10, padding: 12 }}>
           <p className="fd" style={{ color: '#ffd60a', fontSize: '.7rem', letterSpacing: 2, marginBottom: 8 }}>PENDING APPROVAL ({pending.length})</p>
@@ -258,10 +253,10 @@ function PhotoControls() {
               <p style={{ flex: 1, color: '#5a5a8a', fontSize: '.76rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ph.playerName}</p>
               <button className="btn btn-y btn-sm" onClick={() => setGame(s => ({
                 ...s, photos: s.photos.map(p => p.id === ph.id ? { ...p, approved: true } : p),
-              }))}>✓</button>
+              }))}>Y</button>
               <button className="btn btn-ghost btn-sm" onClick={() => setGame(s => ({
                 ...s, photos: s.photos.filter(p => p.id !== ph.id),
-              }))}>✗</button>
+              }))}>N</button>
             </div>
           ))}
         </div>
@@ -271,11 +266,11 @@ function PhotoControls() {
 }
 
 function LinksTab() {
-  const origin = window.location.origin;
-  const playerUrl = `${origin}/play`;
-  const remoteUrl = `${origin}/remote`;
   const [copiedPlayer, setCopiedPlayer] = useState(false);
   const [copiedRemote, setCopiedRemote] = useState(false);
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const playerUrl = `${origin}/play`;
+  const remoteUrl = `${origin}/remote`;
 
   function copy(url, setCopied) {
     navigator.clipboard.writeText(url).then(() => {
@@ -287,7 +282,7 @@ function LinksTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ background: '#161625', border: '1px solid rgba(255,214,10,.3)', borderRadius: 10, padding: 14, textAlign: 'center' }}>
-        <p className="fd" style={{ color: '#ffd60a', letterSpacing: 2, fontSize: '.8rem', marginBottom: 10 }}>📱 PLAYER JOIN LINK</p>
+        <p className="fd" style={{ color: '#ffd60a', letterSpacing: 2, fontSize: '.8rem', marginBottom: 10 }}>PLAYER JOIN LINK</p>
         <p style={{ color: '#5a5a8a', fontSize: '.76rem', marginBottom: 12 }}>Share this link with players to join on their phones</p>
         <div style={{
           background: '#0f0f1c', border: '1px solid #252538', borderRadius: 8,
@@ -296,19 +291,13 @@ function LinksTab() {
           <p style={{ color: '#ffd60a', fontSize: '.85rem', fontFamily: 'monospace' }}>{playerUrl}</p>
         </div>
         <button className="btn btn-y btn-full" onClick={() => copy(playerUrl, setCopiedPlayer)}>
-          {copiedPlayer ? '✅ COPIED!' : '📋 COPY PLAYER LINK'}
+          {copiedPlayer ? 'COPIED!' : 'COPY PLAYER LINK'}
         </button>
       </div>
 
       <div style={{ background: '#161625', border: '1px solid rgba(0,232,255,.3)', borderRadius: 10, padding: 14, textAlign: 'center' }}>
-        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 2, fontSize: '.8rem', marginBottom: 10 }}>🎬 PHONE REMOTE</p>
+        <p className="fd" style={{ color: '#00e8ff', letterSpacing: 2, fontSize: '.8rem', marginBottom: 10 }}>PHONE REMOTE</p>
         <p style={{ color: '#5a5a8a', fontSize: '.76rem', marginBottom: 12 }}>Control the game from your phone</p>
-        <img
-          src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(remoteUrl)}&bgcolor=161625&color=eeeef8&margin=6`}
-          width={140} height={140}
-          style={{ borderRadius: 8, display: 'block', margin: '0 auto 12px' }}
-          alt="Remote QR"
-        />
         <div style={{
           background: '#0f0f1c', border: '1px solid #252538', borderRadius: 8,
           padding: '10px 14px', marginBottom: 10, wordBreak: 'break-all',
@@ -316,7 +305,7 @@ function LinksTab() {
           <p style={{ color: '#00e8ff', fontSize: '.85rem', fontFamily: 'monospace' }}>{remoteUrl}</p>
         </div>
         <button className="btn btn-c btn-full" onClick={() => copy(remoteUrl, setCopiedRemote)}>
-          {copiedRemote ? '✅ COPIED!' : '📋 COPY REMOTE LINK'}
+          {copiedRemote ? 'COPIED!' : 'COPY REMOTE LINK'}
         </button>
       </div>
     </div>
@@ -327,7 +316,7 @@ export default function AdminView() {
   const { game, resetAll, STAGES } = useGame();
   const [sidebarTab, setSidebarTab] = useState('controls');
 
-  const tickerText = Array(10).fill('🔥 THE HOT SEAT  ·  DEBATE NIGHT  ·  HOT TAKES  ·  ').join('');
+  const tickerText = Array(10).fill('THE HOT SEAT  .  DEBATE NIGHT  .  HOT TAKES  .  ').join('');
   const stageLabel = STAGE_LABELS[game.stage] || game.stage;
   const stageIdx = STAGES.indexOf(game.stage);
 
@@ -343,7 +332,7 @@ export default function AdminView() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', flex: 1, overflow: 'hidden', minHeight: 470 }}>
-        {/* Presentation area — the big screen */}
+        {/* Presentation area */}
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: '32px 40px', borderRight: '1px solid #252538', overflow: 'hidden',
@@ -351,16 +340,15 @@ export default function AdminView() {
           <PresArea />
         </div>
 
-        {/* Sidebar — host controls */}
+        {/* Sidebar */}
         <div style={{ background: '#0f0f1c', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          {/* Current stage indicator */}
+          {/* Stage indicator */}
           <div style={{
             padding: '10px 14px', borderBottom: '1px solid #252538',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="fd" style={{ color: '#ff2d55', fontSize: '.85rem' }}>{stageLabel}</span>
-              {/* Stage dots */}
               <div style={{ display: 'flex', gap: 4 }}>
                 {STAGES.map((s, i) => (
                   <div key={s} style={{
@@ -379,9 +367,9 @@ export default function AdminView() {
             display: 'flex', gap: 6, flexShrink: 0,
           }}>
             {[
-              { key: 'controls', label: '🎮 CONTROLS' },
-              { key: 'links', label: '🔗 LINKS' },
-              { key: 'setup', label: '⚙️ SETUP' },
+              { key: 'controls', label: 'CONTROLS' },
+              { key: 'links', label: 'LINKS' },
+              { key: 'setup', label: 'SETUP' },
             ].map(t => (
               <button
                 key={t.key}
@@ -409,10 +397,9 @@ export default function AdminView() {
             {sidebarTab === 'links' && <LinksTab />}
             {sidebarTab === 'setup' && <SetupTab />}
 
-            {/* Reset at the bottom */}
             {sidebarTab === 'controls' && (
               <button className="btn btn-ghost btn-sm" onClick={() => { if (confirm('Reset everything?')) resetAll(); }} style={{ color: '#5a5a8a', fontSize: '.72rem', marginTop: 'auto' }}>
-                ⚠ RESET ALL DATA
+                RESET ALL DATA
               </button>
             )}
           </div>
