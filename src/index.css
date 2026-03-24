@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: #07070e;
+  color: #eeeef8;
+  min-height: 100vh;
+}
+
+#root { min-height: 100vh; }
+
+.fd { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+
+/* Buttons */
+.btn {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1.5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 9px 20px;
+  font-size: 0.95rem;
+  transition: filter 0.15s, transform 0.15s;
+}
+.btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; filter: none; }
+.btn-r { background: #ff2d55; color: #fff; }
+.btn-y { background: #ffd60a; color: #111; }
+.btn-c { background: #00e8ff; color: #111; }
+.btn-g { background: #39ff14; color: #111; }
+.btn-ghost { background: transparent; color: #eeeef8; border: 1px solid #252538; }
+.btn-sm { font-size: 0.76rem; padding: 5px 11px; }
+.btn-lg { font-size: 1.2rem; padding: 13px 28px; }
+.btn-xl { font-size: 1.5rem; padding: 16px 36px; }
+.btn-full { width: 100%; }
+
+/* Inputs */
+.inp {
+  background: #161625;
+  border: 1px solid #252538;
+  border-radius: 7px;
+  color: #eeeef8;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  padding: 9px 13px;
+  outline: none;
+  transition: border 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.inp:focus { border-color: #ff2d55; }
+
+.card { background: #0f0f1c; border: 1px solid #252538; border-radius: 10px; padding: 16px; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes neonP {
+  0%, 100% { text-shadow: 0 0 20px #ff2d55, 0 0 40px rgba(255,45,85,.4); }
+  50% { text-shadow: 0 0 6px #ff2d55; }
+}
+@keyframes neonY {
+  0%, 100% { text-shadow: 0 0 20px #ffd60a; }
+  50% { text-shadow: 0 0 6px #ffd60a; }
+}
+@keyframes flashAnim {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+@keyframes ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-150%); }
+}
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to { opacity: 1; transform: scale(1); }
+}
